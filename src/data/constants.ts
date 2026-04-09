@@ -18,21 +18,8 @@ export const EMPTY_PROMPT_MESSAGE =
 
 export const createDefaultState = (): BuilderState => ({
   role: '',
-  instruction: '',
-  classic: {
-    steps: ['', ''],
-    endGoal: '',
-    narrowing: '',
-  },
-  extended: {
-    structure: '',
-    examples: [
-      {
-        id: crypto.randomUUID(),
-        input: '',
-        output: '',
-      },
-    ],
-    nuance: '',
-  },
+  instructions: '',
+  steps: ['', ''],
+  endGoal: '',
+  narrowing: '',
 })

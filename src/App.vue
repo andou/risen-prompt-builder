@@ -13,33 +13,22 @@ import type { BuilderState, SavedPrompt, TemplatePreset } from './types/risen'
 
 const cloneState = (nextState: BuilderState): BuilderState => ({
   role: nextState.role,
-  instruction: nextState.instruction,
-  classic: {
-    steps: [...nextState.classic.steps],
-    endGoal: nextState.classic.endGoal,
-    narrowing: nextState.classic.narrowing,
-  },
-  extended: {
-    structure: nextState.extended.structure,
-    examples: nextState.extended.examples.map((example) => ({ ...example })),
-    nuance: nextState.extended.nuance,
-  },
+  instructions: nextState.instructions,
+  steps: [...nextState.steps],
+  endGoal: nextState.endGoal,
+  narrowing: nextState.narrowing,
 })
 
 const { theme, toggleTheme } = useTheme()
 const {
-  variant,
   state,
-  switchNotice,
   previewSections,
   assembledPrompt,
   wordCount,
   characterCount,
-  setVariant,
   clearAll,
   applyTemplate,
   hydrate,
-  updateExamples,
 } = useRisen()
 
 const { savedPrompts, saveDraft, loadDraft, savePrompt, deletePrompt } = useStorage()
@@ -49,30 +38,23 @@ const mobilePanel = ref<'form' | 'preview'>('form')
 
 const replaceState = (nextState: BuilderState) => {
   state.role = nextState.role
-  state.instruction = nextState.instruction
-  state.classic = {
-    steps: [...nextState.classic.steps],
-    endGoal: nextState.classic.endGoal,
-    narrowing: nextState.classic.narrowing,
-  }
-  state.extended = {
-    structure: nextState.extended.structure,
-    examples: nextState.extended.examples.map((example) => ({ ...example })),
-    nuance: nextState.extended.nuance,
-  }
+  state.instructions = nextState.instructions
+  state.steps = [...nextState.steps]
+  state.endGoal = nextState.endGoal
+  state.narrowing = nextState.narrowing
 }
 
 onMounted(() => {
   const draft = loadDraft()
   if (draft) {
-    hydrate(draft.variant, draft.state)
+    hydrate(draft.state)
   }
 })
 
 watch(
-  [variant, () => state],
-  ([nextVariant]) => {
-    saveDraft(nextVariant, cloneState(state))
+  () => state,
+  () => {
+    saveDraft(cloneState(state))
   },
   { deep: true },
 )
@@ -94,11 +76,11 @@ const onCopy = async () => {
 }
 
 const onSave = (name: string) => {
-  savePrompt(name, variant.value, cloneState(state))
+  savePrompt(name, cloneState(state))
 }
 
 const onLoad = (prompt: SavedPrompt) => {
-  hydrate(prompt.variant, prompt.state)
+  hydrate(prompt.state)
   mobilePanel.value = 'form'
 }
 
@@ -111,7 +93,7 @@ const onDownload = () => {
   const url = URL.createObjectURL(file)
   const link = document.createElement('a')
   link.href = url
-  link.download = `risen-prompt-${variant.value}.md`
+  link.download = 'risen-prompt-classic.md'
   link.click()
   URL.revokeObjectURL(url)
 }
@@ -127,15 +109,9 @@ const applySelectedTemplate = (template: TemplatePreset) => {
 <template>
   <div class="min-h-screen bg-[var(--bg)] text-[var(--text-body)] transition-colors duration-300">
     <div class="mx-auto max-w-[1280px] px-4 py-4 sm:px-6 lg:px-8">
-      <AppHeader :variant="variant" :theme="theme" @update:variant="setVariant" @toggle-theme="toggleTheme" />
+      <AppHeader :theme="theme" @toggle-theme="toggleTheme" />
 
       <TemplateSelector @apply="applySelectedTemplate" />
-
-      <transition name="fade-slide">
-        <p v-if="switchNotice" class="mt-4 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-alt)] px-4 py-3 text-[13px] text-[var(--text-muted)]">
-          {{ switchNotice }}
-        </p>
-      </transition>
 
       <div class="mt-5 flex rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-1 lg:hidden">
         <button class="segment-button flex-1" :class="mobilePanel === 'form' ? 'segment-button-active' : ''" type="button" @click="mobilePanel = 'form'">Builder</button>
@@ -146,20 +122,19 @@ const applySelectedTemplate = (template: TemplatePreset) => {
         <section :class="mobilePanel === 'preview' ? 'hidden lg:block' : 'block'" class="space-y-4">
           <div class="panel-card px-4 py-4 sm:px-5">
             <p class="eyebrow">Form</p>
-            <h2 class="mt-1 text-[18px] font-semibold tracking-tight text-[var(--text-strong)]">Shape your prompt</h2>
+            <h2 class="mt-1 text-[18px] font-semibold tracking-tight text-[var(--text-strong)]">Shape your coding-agent prompt</h2>
             <p class="mt-1 text-[14px] leading-6 text-[var(--text-muted)]">
-              Build a {{ variant }} RISEN prompt with clean sections, useful examples, and client-side autosave.
+              Build a RISEN prompt for coding agents with practical templates, clean sections, and client-side autosave.
             </p>
           </div>
 
-          <RisenForm :variant="variant" :state="state" @update="updateState" @update-examples="updateExamples" />
+          <RisenForm :state="state" @update="updateState" />
         </section>
 
         <section :class="mobilePanel === 'form' ? 'hidden lg:flex' : 'flex'" class="min-h-[680px] flex-col rounded-[28px] border border-[var(--border-subtle)] bg-[var(--surface)]">
           <PromptPreview :sections="previewSections" :assembled-prompt="assembledPrompt" :word-count="wordCount" :character-count="characterCount" />
           <ActionBar
             :assembled-prompt="assembledPrompt"
-            :variant="variant"
             :saved-prompts="savedPrompts"
             @copy="onCopy"
             @clear="clearAll"

@@ -3,7 +3,7 @@ name: commit
 description: Generate a conventional commit message for staged changes
 ---
 
-Generate a conventional commit message for staged changes.
+Generate a conventional commit message for staged changes and commit.
 
 - Use format: type(scope): description
 - Types: feat, fix, docs, refactor, chore, test

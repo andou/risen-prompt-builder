@@ -15,9 +15,9 @@ const isOpen = ref(false)
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <p class="eyebrow">Template Library</p>
-        <h2 class="mt-1 text-[18px] font-semibold tracking-tight text-[var(--text-strong)]">Start from a structured prompt</h2>
+        <h2 class="mt-1 text-[18px] font-semibold tracking-tight text-[var(--text-strong)]">Start from real coding-agent workflows</h2>
         <p class="mt-1 max-w-2xl text-[14px] leading-6 text-[var(--text-muted)]">
-          Prefill the builder with a practical RISEN prompt and then customize it for your use case.
+          Use prefilled RISEN prompts for debugging, shipping features, refactoring code, expanding tests, and planning migrations.
         </p>
       </div>
 

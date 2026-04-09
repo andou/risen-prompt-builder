@@ -4,9 +4,15 @@ import {
   SAVED_PROMPTS_STORAGE_KEY,
   STORAGE_VERSION,
 } from '../data/constants'
-import type { BuilderState, RisenVariant, SavedPrompt, StoragePayload } from '../types/risen'
+import type { BuilderState, SavedPrompt, StoragePayload } from '../types/risen'
 
-const cloneState = (state: BuilderState): BuilderState => structuredClone(state)
+const cloneState = (state: BuilderState): BuilderState => ({
+  role: state.role,
+  instructions: state.instructions,
+  steps: [...state.steps],
+  endGoal: state.endGoal,
+  narrowing: state.narrowing,
+})
 
 const parseJSON = <T>(value: string | null): T | null => {
   if (!value) {
@@ -29,10 +35,9 @@ export const useStorage = () => {
     window.localStorage.setItem(SAVED_PROMPTS_STORAGE_KEY, JSON.stringify(savedPrompts.value))
   }
 
-  const saveDraft = (variant: RisenVariant, state: BuilderState) => {
+  const saveDraft = (state: BuilderState) => {
     const payload: StoragePayload = {
       version: STORAGE_VERSION,
-      variant,
       state: cloneState(state),
       updatedAt: new Date().toISOString(),
     }
@@ -50,12 +55,11 @@ export const useStorage = () => {
     return payload
   }
 
-  const savePrompt = (name: string, variant: RisenVariant, state: BuilderState) => {
+  const savePrompt = (name: string, state: BuilderState) => {
     const now = new Date().toISOString()
     const prompt: SavedPrompt = {
       id: crypto.randomUUID(),
       name,
-      variant,
       state: cloneState(state),
       createdAt: now,
       updatedAt: now,

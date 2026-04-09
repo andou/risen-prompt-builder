@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { SavedPrompt, RisenVariant } from '../types/risen'
+import type { SavedPrompt } from '../types/risen'
 
 const props = defineProps<{
   assembledPrompt: string
-  variant: RisenVariant
   savedPrompts: SavedPrompt[]
 }>()
 
@@ -75,7 +74,6 @@ const formatDate = (value: string) =>
           <div>
             <div class="flex items-center gap-2">
               <span class="text-[14px] font-semibold text-[var(--text-strong)]">{{ item.name }}</span>
-              <span class="inline-flex rounded-full border border-[var(--border-strong)] px-2 py-0.5 text-[11px] uppercase tracking-[0.14em] text-[var(--text-faint)]">{{ item.variant }}</span>
             </div>
             <p class="mt-1 text-[12px] text-[var(--text-faint)]">Updated {{ formatDate(item.updatedAt) }}</p>
           </div>
